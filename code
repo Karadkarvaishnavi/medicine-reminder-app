@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Medicine Reminder App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #4ca1af, #c4e0e5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background-color: #f0f8ff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      width: 350px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+    #clock {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .reminder {
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .delete-btn:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Medicine Reminder App</h2>
+  <div id="clock">Time: --:--:--</div>
+
+  <input type="text" id="medicineName" placeholder="Enter medicine name">
+  <input type="time" id="reminderTime">
+  <select id="pieces">
+    <option value="Half">Half</option>
+    <option value="One">One</option>
+    <option value="Two">Two</option>
+  </select>
+  <button onclick="addReminder()">Add Reminder</button>
+
+  <div id="reminderList"></div>
+</div>
+
+<audio id="beep-sound" src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" preload="auto"></audio>
+
+<script>
+  let reminders = [];
+
+  function updateClock() {
+    const now = new Date();
+    const timeStr = now.toTimeString().slice(0, 8);
+    document.getElementById("clock").innerText = "Time: " + timeStr;
+  }
+
+  setInterval(updateClock, 1000);
+
+  function addReminder() {
+    const name = document.getElementById("medicineName").value.trim();
+    const time = document.getElementById("reminderTime").value;
+    const pieces = document.getElementById("pieces").value;
+
+    if (!name || !time) {
+      alert("Please enter medicine name and time.");
+      return;
+    }
+
+    reminders.push({ name, time, pieces });
+    displayReminders();
+
+    // Clear inputs
+    document.getElementById("medicineName").value = "";
+    document.getElementById("reminderTime").value = "";
+    document.getElementById("pieces").value = "Half";
+  }
+
+  function displayReminders() {
+    const list = document.getElementById("reminderList");
+    list.innerHTML = "";
+    reminders.forEach((r, index) => {
+      list.innerHTML += `
+        <div class="reminder">
+          ${r.name} (${r.pieces}) : ${r.time}
+          <button class="delete-btn" onclick="deleteReminder(${index})">Delete</button>
+        </div>
+      `;
+    });
+  }
+
+  function deleteReminder(index) {
+    reminders.splice(index, 1);
+    displayReminders();
+  }
+
+  setInterval(() => {
+    const now = new Date();
+    const current = now.toTimeString().slice(0, 5); // HH:MM
+    reminders.forEach(reminder => {
+      if (reminder.time === current) {
+        const sound = document.getElementById("beep-sound");
+        sound.play();
+        alert(⏰ Reminder: Take ${reminder.pieces} piece(s) of "${reminder.name}");
+      }
+    });
+  }, 60000); // Check every minute
+</script>
+
+</body>
+</html>
